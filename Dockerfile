@@ -1,11 +1,17 @@
 FROM centos:6.7
 
-RUN yum -y install wget build-essential tcl8.5 tar && yum clean all
-RUN wget http://download.redis.io/releases/redis-stable.tar.gz
-RUN tar xzf redis-stable.tar.gz
-RUN cd redis-stable && make && make install
-RUN ./redis-stable/utils/install_server.sh
+RUN curl --silent --location https://rpm.nodesource.com/setup | bash -
+RUN yum -y install nodejs
 
-EXPOSE 6379
+ENV PORT 5555
 
-ENTRYPOINT  ["redis-server"]
+RUN mkdir -p /apps/nodetest
+
+ADD files/app.js /apps/nodetest/app.js
+ADD scripts/run.sh /root/run.sh
+
+WORKDIR /apps/nodetest
+
+EXPOSE 5555
+
+CMD ["node", "app.js"]
